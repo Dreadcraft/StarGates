@@ -1,0 +1,211 @@
+name: StarGates
+main: net.doodcraft.Dooder07.Stargates.Wormhole.StarGates
+version: 1.21
+authors: [Lologarithm, alron, lycano, Dooder_07]
+
+commands:
+   stargates:
+     description: Shows all available commands for Players
+     usage: |
+            §8§m----------------§r§3 .:§6 STARGATES §3:. §8§m----------------
+              §7/dial §8- §eConnect to another stargate
+              §7/sglist §8- §eList all available stargates
+              §7/sgcompass §8- §ePoint your compass to the nearest stargate
+              §7/sgcomplete §8- §eRegister a valid portal frame as a stargate
+              §7/sgidc §8- §eRegister a new IDC for your stargate
+
+   stargatesadmin:
+     description: Shows all available commands for Administrators
+     usage: |
+            §8§m----------------§r§3 .:§6 STARGATES §3:. §8§m----------------
+              §7/wormhole §8- §eCustomize portal settings
+              §7/sgbuildlist §8- §eList all available portal frames
+              §7/sgbuild §8- §eAuto-construct given portal frame
+              §7/sgremove §8- §eDelete a registered stargate
+              §7/sgforce §8- §eShut down specified stargate
+              §7/sggo §8- §eTeleport to specified stargate
+              §7/sgreload §8- §eReload this plugin
+              §7/sgstatus §8- §eReport Stargate system status
+            
+   dial:
+     description: Dial a remote Stargate, unlock IDC with optional password 
+     usage: |
+            §7/<command> §b<StarGate> §6[IDC]
+            §b<StarGate> §7The StarGate to dial.
+            §6[IDC] §7Use optional password to open remote Iris.
+
+   wormhole:
+     description: Wormhole administration and configuration commands.
+     aliases: [wh]
+     usage: |
+            §7/<command> §b<commandtype> §6[ARG1] [ARG2]
+            §7Valid commandtypes - §bowner§7, §bperms§7, §bportalmaterial§7, §birismaterial§7, §blightmaterial§7, §bshutdown_timeout§7, §bactivate_timeout§7, §bsimple§7, §bregenerate§7, §bredstone§7, §btoggle_gwm§7, §bshow_gwm§7, §btoggle_transport§7, §bshow_transport§7, §bpermissions §7and §bcustom§7.
+
+   sglist:
+     description: List all Stargates.
+     usage: |
+            §7/<command> - List all Stargates.
+
+   sgbuild:
+     description: Automatically Build Stargate.
+     usage: |
+            §7/<command> §b<GateShape>
+            §b<GateShape> §7The GateShape to build.
+            §7After placing a DHD with a button (and sign if wanted) running this command then pressing the button will cause the specified §b<GateShape>§7 to be built.
+
+   sgbuildlist:
+     description: List available gate shapes
+     usage: |
+            §7/<command>
+
+   sgremove:
+     description: Remove a stargate, optionally destroy its blocks.
+     usage: |
+            §7/<command> §b<GateName> §6[-all]
+            §b<GateName> §7The GateName to remove.
+            §6[-all] §7destroys gate blocks too.
+
+   sgcompass:
+     description: Point compass needle at nearest Stargate.
+     usage: |
+            §7/<command> - Point compass needle at nearest Stargate.
+
+   sgcomplete:
+     description: Complete StarGate construction.
+     usage: |
+            §7/<command> §b<GateName> §eidc=§6[IDC] §enet=§a[Net]
+            §b<GateName> §7The name to give new Stargate.
+            §6[IDC] §7Optional password to give Stargate.
+            §a[Net] §7Optional network for Stargate.
+
+   sgidc:
+     description: Gets or sets a gates IDC code.
+     usage: |
+            §7/<command> §b<GateName> §6<optional_set_idc>
+            §7Requires being the stargate owner
+            §7set -clear to remove the IDC
+
+   sgforce:
+     description: Forcefully shut down, darken, and open the iris of either a single or all gates.
+     usage: |
+            §7/<command> §e<gateName|-all>
+
+   sggo:
+     description: Teleport to specified wormhole.
+     usage: |
+            §7/<command> §b<GateName>
+            
+   sgreload:
+     description: Reload WormholeXTreme
+     aliases: [sgre]
+     usage: |
+            §7/<command> §b<commandType> §7- Reload WormholeXTreme
+            §7Valid commandtypes - §bn(ow)
+
+   sgstatus:
+     description: Show system status
+     aliases: [sgs]
+     usage: |
+            §7/<command> §b<commandType> §7- Show status
+            §7Valid commandtypes - §ba(ll)
+            
+permissions:
+  wormhole.use.sign:
+    description: Player is able to use the dialer sign
+    default: true
+  wormhole.use.dialer:
+    description: Player is able to use the dialer
+    default: true
+  wormhole.use.compass:
+    description: Can use the wormhole compass
+    default: true
+  wormhole.use.*:
+    description: Can use all wormhole use nodes
+    children:
+      wormhole.use.sign: true
+      wormhole.use.dialer: true
+      wormhole.use.compass: true
+  wormhole.cooldown.groupone:
+    description: Use cooldown group one
+    default: false
+  wormhole.cooldown.grouptwo:
+    description: Use cooldown group two
+    default: false
+  wormhole.cooldown.groupthree:
+    description: Use cooldown group three
+    default: false
+  wormhole.cooldown.*:
+    description: Can use all cooldown nodes
+    children:
+      wormhole.cooldown.groupone: true
+      wormhole.cooldown.grouptwo: true
+      wormhole.cooldown.groupthree: true
+  wormhole.remove.own:
+    description: Can remove own gates
+    default: op
+  wormhole.remove.all:
+    description: Can remove a gate using -all command
+    default: op
+  wormhole.remove.*:
+    description: Can use all remove permissions
+    children:
+      wormhole.remove.own: true
+      wormhole.remove.all: true
+  wormhole.build:
+    description: Can build Wormhole
+    default: op
+  wormhole.build.groupone:
+    description: Build restriction for groupone
+    default: false
+  wormhole.build.grouptwo:
+    description: Build restriction for grouptwo
+    default: false
+  wormhole.build.groupthree:
+    description: Build restriction for groupthree
+    default: false
+  wormhole.build.*:
+    description: Can use all build permissions
+    children:
+      wormhole.build: true
+      wormhole.build.groupone: true
+      wormhole.build.grouptwo: true
+      wormhole.build.groupthree: true
+  wormhole.config:
+    description: Can modify Wormhole config
+    default: op
+  wormhole.list:
+    description: Can list wormhole gates
+    default: true
+  wormhole.network.use:
+    description: Can use gate network
+    default: true
+  wormhole.network.build:
+    description: Can build networks
+    default: op
+  wormhole.network.*:
+    description: Can use all network permissions
+    children:
+      wormhole.network.use: true
+      wormhole.network.build: true
+  wormhole.go:
+    description: Can teleport to a wormhole location
+    default: op
+  wormhole.simple.use:
+    description: Can use wormhole
+    default: true
+  wormhole.simple.config:
+    description: Can modify configuration
+    default: op
+  wormhole.simple.build:
+    description: Can build a wormhole
+    default: op
+  wormhole.simple.remove:
+    description: Can remove a wormhole
+    default: op
+  wormhole.simple.*:
+    description: Can use all simple wormhole nodes
+    children:
+      wormhole.simple.config: true
+      wormhole.simple.build: true
+      wormhole.simple.remove: true
+      wormhole.simple.use: true

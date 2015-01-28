@@ -1,0 +1,5 @@
+database:
+    type: sqlite
+    url: ./plugins/StarGates/StarGatesDB/StarGates.sqlite
+    user: sa
+    password: 
