@@ -7,6 +7,9 @@ Unofficial fork inititiated to give a new face to the awesome Bukkit plugin, <a 
 <br>
 </div>
 <br>
+
+TODO: add some CSS to this shit
+
 Installation:
 
   Drag and drop the StarGates.jar into your plugins directory. Guaranteed to load on the latest Spigot/Bukkit builds.
