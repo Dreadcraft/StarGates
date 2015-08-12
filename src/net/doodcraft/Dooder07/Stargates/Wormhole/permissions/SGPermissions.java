@@ -5,8 +5,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
 
-import org.bukkit.entity.Player;
-
 public class SGPermissions {
 
     public static enum PermissionType {

@@ -1,22 +1,18 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.model;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable.ActionToTake;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
 
 public class StargateManager {
 
@@ -28,30 +24,21 @@ public class StargateManager {
     private static Map<String, StargateShape> playerBuilders = new HashMap<String, StargateShape>();
     private static Map<Location, Block> openingAnimationBlocks = new HashMap<Location, Block>();
 
+    public static void addActivatedStargate(Stargate s) {
+        addActivatedStargate(s.getGateName(), s);
+    }
+    
     public static void addActivatedStargate(String gateName, Stargate s) {
         if (!hasActivatedStargate(gateName))
             getActivatedStargates().put(gateName, s);
     }
-    
-    public static void addActivatedStargate(Stargate s) {
-        addActivatedStargate(s.getGateName(), s);
-    }
 
-    public static boolean hasActivatedStargate(String gateName) {
-        return getActivatedStargates().containsKey(gateName);
-
-    }
-    
-    public static boolean hasActivatedStargate(Stargate s) {
-        return hasActivatedStargate(s.getGateName());
-    }
-    
     public static void addBlockIndex(Block b, Stargate s) {
         if ((b != null) && (s != null)) {
             getAllGateBlocks().put(b.getLocation(), s);
         }
     }
-
+    
     public static void addGateToNetwork(Stargate gate, String network) {
         if (!getStargateNetworks().containsKey(network)) {
             addStargateNetwork(network);
@@ -67,7 +54,7 @@ public class StargateManager {
             }
         }
     }
-
+    
     public static void addIncompleteStargate(String playerName, Stargate stargate) {
         getIncompleteStargates().put(playerName, stargate);
     }
@@ -116,6 +103,14 @@ public class StargateManager {
         return sn;
     }
 
+    public static boolean completeStargate(Player player, Stargate stargate) {
+        return completeStargate(player.getName(), stargate);
+    }
+
+    public static boolean completeStargate(Player player, String gateName, String idc, String network) {
+        return completeStargate(player.getName(), gateName, idc, network);
+    }
+
     public static boolean completeStargate(String playerName, Stargate stargate) {
         Stargate posDupe = StargateManager.getStargate(stargate.getGateName());
         if (posDupe != null)
@@ -142,14 +137,6 @@ public class StargateManager {
         	
         	return false;
         }
-    }
-    
-    public static boolean completeStargate(Player player, Stargate stargate) {
-        return completeStargate(player.getName(), stargate);
-    }
-
-    public static boolean completeStargate(Player player, String gateName, String idc, String network) {
-        return completeStargate(player.getName(), gateName, idc, network);
     }
     
     public static boolean completeStargate(String playerName, String gateName, String idc, String network) {
@@ -206,7 +193,7 @@ public class StargateManager {
         
         return distance;
     }
-
+    
     public static Stargate findClosestStargate(Location self) {
         Stargate stargate = null;
         
@@ -268,15 +255,15 @@ public class StargateManager {
     public static StargateShape getPlayerBuilderShape(Player player) {
         return getPlayerBuilderShape(player.getName());
     }
-    
+
     public static StargateShape getPlayerBuilderShape(String playerName) {
         if (getPlayerBuilders().containsKey(playerName)) {
             return getPlayerBuilders().remove(playerName);
         }
         
         return null;
-    }    
-    
+    }
+
     private static double getSquaredDistance(Location self, Location target) {
         double distance = Double.MAX_VALUE;
         if ((self != null) && (target != null)) {
@@ -284,13 +271,21 @@ public class StargateManager {
         }
         return distance;
     }
-
+    
     public static Stargate getStargate(String gateName) {
         if (getStargateList().containsKey(gateName)) {
             return getStargateList().get(gateName);
         }
         
         return null;
+    }    
+    
+    public static Stargate getStargateByPlayer(Player player) {
+        return getStargateByPlayer(player.getName());
+    }
+
+    public static Stargate getStargateByPlayer(String playerName) {
+        return getActivatedStargates().get(playerName);
     }
 
     private static HashMap<String, Stargate> getStargateList() {
@@ -309,6 +304,15 @@ public class StargateManager {
         return (HashMap<String, StargateNetwork>) stargateNetworks;
     }
 
+    public static boolean hasActivatedStargate(Stargate s) {
+        return hasActivatedStargate(s.getGateName());
+    }
+
+    public static boolean hasActivatedStargate(String gateName) {
+        return getActivatedStargates().containsKey(gateName);
+
+    }
+
     public static boolean isBlockInGate(Block block) {
         return isLocationInGate(block.getLocation());
     }
@@ -324,7 +328,7 @@ public class StargateManager {
     public static Stargate removeActivatedStargate(String gateName) {
         return getActivatedStargates().remove(gateName);
     }
-
+    
     public static void removeBlockIndex(Block block) {
         if (block != null) {
             getAllGateBlocks().remove(block.getLocation());
@@ -338,7 +342,7 @@ public class StargateManager {
     public static void removeIncompleteStargate(String playerName) {
         getIncompleteStargates().remove(playerName);
     }
-
+    
     public static void removeStargate(Stargate s) {
         getStargateList().remove(s.getGateName());
 
@@ -372,13 +376,5 @@ public class StargateManager {
         for (Location b : s.getGatePortalBlocks()) {
             getAllGateBlocks().remove(b);
         }        
-    }
-    
-    public static Stargate getStargateByPlayer(Player player) {
-        return getStargateByPlayer(player.getName());
-    }
-    
-    public static Stargate getStargateByPlayer(String playerName) {
-        return getActivatedStargates().get(playerName);
     }
 }

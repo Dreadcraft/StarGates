@@ -6,11 +6,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 public class Go implements CommandExecutor {
 
     private static boolean doGo(final Player player, final String[] args) {

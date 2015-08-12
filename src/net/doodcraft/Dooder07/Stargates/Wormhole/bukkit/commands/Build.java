@@ -7,11 +7,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGStringUtils;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 public class Build implements CommandExecutor {
 
     private static boolean doBuild(final Player player, final String[] args) {

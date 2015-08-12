@@ -1,5 +1,7 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.permissions;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable;
@@ -8,10 +10,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
-
-import org.bukkit.entity.Player;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 public class StargateRestrictions {
 

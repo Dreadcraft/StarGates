@@ -63,16 +63,12 @@ public class WormholePlayerUsageProperties {
     }
     
     
-    public boolean hasUseCooldown() {
-        return this.hasUseCooldown;
-    }
-    
     public boolean hasActivatedStargate() {
         return this.hasActivatedStargate;
     }
     
-    public boolean hasUsedStargate() {
-        return this.hasUsedStargate;
+    public boolean hasDialedStargate() {
+        return this.hasDialedStargate;
     }
     
     public boolean hasPermission() {
@@ -83,79 +79,83 @@ public class WormholePlayerUsageProperties {
         return this.hasReachedDestination;
     }
     
-    public boolean hasDialedStargate() {
-        return this.hasDialedStargate;
-    }
-    
-    public boolean hasShutdownGate() {
-        return this.hasShutdownGate;
+    public boolean hasReceivedInvalidTargetMessage() {
+        return this.hasReceivedInvalidTargetMessage;
     }
     
     public boolean hasReceivedIrisLockMessage() {
         return this.hasReceivedIrisLockMessage;
     }
     
+    public boolean hasReceivedNoPermissionMessage() {
+        return this.hasReceivedNoPermissionMessage;
+    }
+    
     public boolean hasReceivedRemoteActiveMessage() {
         return this.hasReceivedRemoteActiveMessage;
     }
     
-    public boolean hasReceivedInvalidTargetMessage() {
-        return this.hasReceivedInvalidTargetMessage;
+    public boolean hasShutdownGate() {
+        return this.hasShutdownGate;
     }
     
-    public boolean hasReceivedNoPermissionMessage() {
-        return this.hasReceivedNoPermissionMessage;
-    }    
-    
-    public boolean setHasReceivedWasActivatedOther() {
-        return this.hasReceivedWasActivatedOther;
-    }    
-    
-    public void setHasUseCooldown(boolean hasUseCooldown) {
-        this.hasUseCooldown = hasUseCooldown;
+    public boolean hasUseCooldown() {
+        return this.hasUseCooldown;
     }
+    
+    public boolean hasUsedStargate() {
+        return this.hasUsedStargate;
+    }    
     
     public void setHasActivatedStargate(boolean activated) {
         this.hasActivatedStargate = activated;
-    }
-       
-    public void setHasUsedStargate(boolean hasUsedStargate) {
-        this.hasUsedStargate = hasUsedStargate;
+    }    
+    
+    public void setHasDialedStargate(boolean dialed) {
+        this.hasDialedStargate = dialed;
     }
     
     public void setHasPermission(boolean hasPermission) {
         this.hasPermission = hasPermission;
     }
-    
+       
     public void setHasReachedDestination(boolean hasReachedDestination) {
         this.hasReachedDestination = hasReachedDestination;
-    }
-    
-    public void setHasDialedStargate(boolean dialed) {
-        this.hasDialedStargate = dialed;
-    }    
-
-    public void setHasReceivedIrisLockMessage(boolean received) {
-        this.hasReceivedIrisLockMessage = received;
-    }
-    
-    public void setHasShutdownGate(boolean shutdown) {
-        this.hasShutdownGate = shutdown;
-    }
-    
-    public void setHasReceivedRemoteActiveMessage(boolean active) {
-        this.hasReceivedRemoteActiveMessage = active;
-    }
-    
-    public void setHasReceivedWasActivatedOther(boolean other) {
-        this.hasReceivedWasActivatedOther = other;
     }
     
     public void setHasReceivedInvalidTargetMessage(boolean received) {
         this.hasReceivedInvalidTargetMessage = received;
     }
     
+    public void setHasReceivedIrisLockMessage(boolean received) {
+        this.hasReceivedIrisLockMessage = received;
+    }
+    
     public void setHasReceivedNoPermissionMessage(boolean received) {
         this.hasReceivedNoPermissionMessage = received;
+    }    
+
+    public void setHasReceivedRemoteActiveMessage(boolean active) {
+        this.hasReceivedRemoteActiveMessage = active;
+    }
+    
+    public boolean setHasReceivedWasActivatedOther() {
+        return this.hasReceivedWasActivatedOther;
+    }
+    
+    public void setHasReceivedWasActivatedOther(boolean other) {
+        this.hasReceivedWasActivatedOther = other;
+    }
+    
+    public void setHasShutdownGate(boolean shutdown) {
+        this.hasShutdownGate = shutdown;
+    }
+    
+    public void setHasUseCooldown(boolean hasUseCooldown) {
+        this.hasUseCooldown = hasUseCooldown;
+    }
+    
+    public void setHasUsedStargate(boolean hasUsedStargate) {
+        this.hasUsedStargate = hasUsedStargate;
     }    
 }

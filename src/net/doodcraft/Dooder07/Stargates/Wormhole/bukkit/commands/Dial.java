@@ -1,5 +1,7 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.bukkit.commands;
 
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
@@ -8,13 +10,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.Permi
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayer;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.logging.Level;
 
 public class Dial implements CommandExecutor {
 

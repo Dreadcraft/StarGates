@@ -1,12 +1,10 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.permissions;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateDBManager;
-
-import org.bukkit.entity.Player;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PermissionsManager {
 

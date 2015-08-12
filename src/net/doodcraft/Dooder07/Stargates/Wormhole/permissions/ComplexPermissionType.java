@@ -1,16 +1,14 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.permissions;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
-import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
-import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.entity.Player;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+
+import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
+import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 
 enum ComplexPermissionType {
 
@@ -32,18 +30,18 @@ enum ComplexPermissionType {
     NETWORK_BUILD("wormhole.network.build."),
     GO("wormhole.go");
 
-    private final String complexPermissionNode;
     private static final Map<String, ComplexPermissionType> complexPermissionMap = new HashMap<String, ComplexPermissionType>();
     static {
         for (final ComplexPermissionType type : EnumSet.allOf(ComplexPermissionType.class)) {
             complexPermissionMap.put(type.complexPermissionNode, type);
         }
     }
-
     public static ComplexPermissionType fromComplexPermissionNode(final String complexPermissionNode) // NO_UCD
     {
         return complexPermissionMap.get(complexPermissionNode);
     }
+
+    private final String complexPermissionNode;
 
     private ComplexPermissionType(final String complexPermissionNode) {
         this.complexPermissionNode = complexPermissionNode;

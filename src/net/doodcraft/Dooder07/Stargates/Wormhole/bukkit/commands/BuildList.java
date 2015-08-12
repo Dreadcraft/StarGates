@@ -5,12 +5,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateHelper;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 public class BuildList implements CommandExecutor {
 
     private static boolean listBuilds(final Player player, final String[] args) {

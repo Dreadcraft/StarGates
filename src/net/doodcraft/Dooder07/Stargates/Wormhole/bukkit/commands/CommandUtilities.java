@@ -1,12 +1,9 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.bukkit.commands;
 
+import java.util.ArrayList;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
 
 public class CommandUtilities {
 

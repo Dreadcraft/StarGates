@@ -1,14 +1,12 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.model;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.Material;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 
 public class StargateShape {
 

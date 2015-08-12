@@ -1,11 +1,5 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.config;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager.ConfigKeys;
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.plugin.PluginDescriptionFile;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
+
+import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager.ConfigKeys;
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 
 public class Configuration {
 

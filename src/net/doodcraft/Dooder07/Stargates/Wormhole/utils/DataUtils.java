@@ -1,10 +1,8 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.utils;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-
 import java.nio.ByteBuffer;
+
+import javax.xml.stream.Location;
 
 public class DataUtils {
 

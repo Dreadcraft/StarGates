@@ -1,5 +1,11 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable;
@@ -8,20 +14,6 @@ import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayer;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.Level;
 
 public class Stargate {
 
@@ -240,6 +232,109 @@ public class Stargate {
         }
     }
 
+    public void dialSignClicked() {
+        this.dialSignClicked(null);
+    }
+
+    @SuppressWarnings("deprecation")
+	public void dialSignClicked(Action eventAction) {
+        synchronized (getGateNetwork().getNetworkGateLock()) {
+            //@TODO check if this is still needed
+            getGateDialSignBlock().setTypeIdAndData(Material.WALL_SIGN.getId(), WorldUtils.getSignFacingByteFromBlockFace(getGateFacing()), false);
+            setGateDialSign((Sign) getGateDialSignBlock().getState());
+            getGateDialSign().setLine(0, "-" + getGateName() + "-");
+            
+            String lineMarkerS = ">" + ChatColor.GREEN;
+            String lineMarkerE = ChatColor.BLACK + "<";
+
+            if (getGateNetwork().getNetworkSignGateList().size() <= 1) {
+                getGateDialSign().setLine(1, "");
+                getGateDialSign().setLine(2, ChatColor.DARK_RED + "No Other Gates" + ChatColor.BLACK);
+                getGateDialSign().setLine(3, "");
+                getGateDialSign().update();
+                setGateDialSignTarget(null);
+                return;
+            }
+
+            if (getGateDialSignIndex() == -1) {
+                setGateDialSignIndex(0);
+            }
+
+            int direction = 1;
+            if ((eventAction != null) && (eventAction.equals(Action.RIGHT_CLICK_BLOCK))) {
+                direction = -1;
+            }
+            
+            getGateSignOrder().clear();
+            int orderIndex = 1;
+
+            if (getGateDialSignIndex() > getGateNetwork().getNetworkSignGateList().size()) {
+                setGateDialSignIndex(0);
+            }
+
+            for (int i = 0; i < 4; i++) {
+                if (getGateDialSignIndex() == getGateNetwork().getNetworkSignGateList().size()) {
+                    setGateDialSignIndex(0);
+                }
+
+                if (getGateDialSignIndex() < 0) {
+                    setGateDialSignIndex(getGateNetwork().getNetworkSignGateList().size() - 1);
+                }
+
+                if (getGateNetwork().getNetworkSignGateList().get(getGateDialSignIndex()).getGateName().equals(getGateName())) {
+                    setGateDialSignIndex(getGateDialSignIndex() + direction);
+
+                    if (getGateDialSignIndex() == getGateNetwork().getNetworkSignGateList().size()) {
+                        setGateDialSignIndex(0);
+                    }
+                }
+
+                if (getGateDialSignIndex() >= 0) {
+                    getGateSignOrder().put(orderIndex, getGateNetwork().getNetworkSignGateList().get(getGateDialSignIndex()));
+                    orderIndex++;
+
+                    setGateDialSignIndex(getGateDialSignIndex() + direction);
+                }
+            }
+
+            //@TODO: remove debug
+            //System.out.println(getGateNetwork().getNetworkName() + " size: " + getGateNetwork().getNetworkSignGateList().size());
+            //for (Stargate s: getGateNetwork().getNetworkSignGateList()) {
+            //    System.out.println(s.getGateDialSignIndex() + ": " + s.getGateName());
+            //}
+
+            String line1 = "";
+            String line2 = "";
+            String line3 = "";
+            String lineTemp = "";
+
+            if (getGateNetwork().getNetworkSignGateList().size() >= 2) {
+                line2 = lineMarkerS + getGateSignOrder().get(2).getGateName() + lineMarkerE;
+            } else {
+                line2 = lineMarkerS + getGateSignOrder().get(1).getGateName() + lineMarkerE;
+            }
+
+            if (getGateNetwork().getNetworkSignGateList().size() > 2) {
+                line1 = getGateSignOrder().get(1).getGateName();
+                line3 = getGateSignOrder().get(3).getGateName();
+            }
+
+            setGateDialSignTarget(getGateSignOrder().get(2));
+            setGateDialSignIndex(getGateNetwork().getNetworkSignGateList().indexOf(getGateSignOrder().get(2)));
+
+            if (direction == -1) {
+                lineTemp = line1;
+                line1 = line3;
+                line3 = lineTemp;
+            }
+
+            getGateDialSign().setLine(1, line1);
+            getGateDialSign().setLine(2, line2);
+            getGateDialSign().setLine(3, line3);
+            getGateDialSign().update(true);
+        }
+    }
+    
     private boolean dialStargate() {
         WorldUtils.scheduleChunkLoad(getGatePlayerTeleportLocation().getBlock());
         if (getGateShutdownTaskId() > 0) {
@@ -319,7 +414,7 @@ public class Stargate {
 
         return false;
     }
-    
+
     @SuppressWarnings("deprecation")
 	public void establishWormhole() {
         if (getGateEstablishWormholeTaskId() > 0) {
@@ -344,12 +439,7 @@ public class Stargate {
             setGateEstablishWormholeTaskId(StarGates.getScheduler().scheduleAsyncDelayedTask(StarGates.getThisPlugin(), new StargateUpdateRunnable(this, ActionToTake.ESTABLISH_WORMHOLE)));
         }
     }
-
-    @SuppressWarnings("deprecation")
-	public void fillGateInterior(Material mat) {
-        fillGateInterior(mat.getId());
-    }
-
+    
     @SuppressWarnings("deprecation")
 	public void fillGateInterior(int typeId) {
         for (Location loc : getGatePortalBlocks()) {
@@ -359,10 +449,15 @@ public class Stargate {
         }
     }
     
-    private int getGateEstablishWormholeTaskId() {
-        return gateEstablishWormholeTaskId;
+    @SuppressWarnings("deprecation")
+	public void fillGateInterior(Material mat) {
+        fillGateInterior(mat.getId());
     }
-    
+
+    public boolean gateChevronsLocked() {
+        return this.gateChevronsLocked;
+    }
+
     private int getGateActivateTaskId() {
         return gateActivateTaskId;
     }
@@ -381,6 +476,10 @@ public class Stargate {
 
     private int getGateAnimationStep3D() {
         return gateAnimationStep3D;
+    }
+
+    public boolean getGateChevronsLocked() {
+        return this.gateChevronsLocked;
     }
 
     public Material getGateCustomIrisMaterial() {
@@ -433,6 +532,10 @@ public class Stargate {
 
     public Stargate getGateDialSignTarget() {
         return gateDialSignTarget;
+    }
+
+    private int getGateEstablishWormholeTaskId() {
+        return gateEstablishWormholeTaskId;
     }
 
     public BlockFace getGateFacing() {
@@ -526,7 +629,7 @@ public class Stargate {
     long getGateTempTargetId() {
         return gateTempTargetId;
     }
-
+    
     public ArrayList<ArrayList<Location>> getGateWooshBlocks() {
         return gateWooshBlocks;
     }
@@ -535,16 +638,20 @@ public class Stargate {
         return gateWorld;
     }
 
+    public String getLastUsedBy() {
+        return this.lastUsedBy;
+    }
+
     public byte getLoadedVersion() {
         return loadedVersion;
     }
 
+    public String getSourceGateName() {
+        return this.gateSourceName;
+    }
+
     public boolean isGateActive() {
         return this.gateActive;
-    }
-    
-    public boolean getGateChevronsLocked() {
-        return this.gateChevronsLocked;
     }
 
     private boolean isGateAnimationRemoving() {
@@ -558,11 +665,11 @@ public class Stargate {
     public boolean isGateIrisActive() {
         return gateIrisActive;
     }
-
+    
     private boolean isGateIrisDefaultActive() {
         return gateIrisDefaultActive;
     }
-
+    
     public boolean isGateLightsActive() {
         return gateLightsActive;
     }
@@ -578,15 +685,11 @@ public class Stargate {
     public boolean isGateSignPowered() {
         return gateSignPowered;
     }
-    
+
     public boolean isWormholeEstablished() {
         return gateEstablishedWormhole;
     }
     
-    public void setWormholeEstablished(boolean established) {
-        this.gateEstablishedWormhole = established;
-    }
-
     public void lightStargate(boolean on) {
         SGLogger.prettyLog(Level.FINE, false, "Lighting up '" + this.getGateName() + "'");
 
@@ -682,10 +785,6 @@ public class Stargate {
     private void setGateActivateTaskId(final int gateActivateTaskId) {
         this.gateActivateTaskId = gateActivateTaskId;
     }
-    
-    private void setGateEstablishWormholeTaskId(int gateEstablishWormholeTaskId) {
-        this.gateEstablishWormholeTaskId = gateEstablishWormholeTaskId;
-    }
 
     public void setGateActive(final boolean gateActive) {
         this.gateActive = gateActive;
@@ -705,6 +804,10 @@ public class Stargate {
 
     private void setGateAnimationStep3D(final int gateAnimationStep3D) {
         this.gateAnimationStep3D = gateAnimationStep3D;
+    }
+
+    public void setGateChevronsLocked(boolean locked) {
+        this.gateChevronsLocked = locked;
     }
 
     public void setGateCustom(final boolean gateCustom) {
@@ -761,6 +864,10 @@ public class Stargate {
 
     protected void setGateDialSignTarget(final Stargate gateDialSignTarget) {
         this.gateDialSignTarget = gateDialSignTarget;
+    }
+
+    private void setGateEstablishWormholeTaskId(int gateEstablishWormholeTaskId) {
+        this.gateEstablishWormholeTaskId = gateEstablishWormholeTaskId;
     }
 
     public void setGateFacing(final BlockFace gateFacing) {
@@ -846,55 +953,27 @@ public class Stargate {
     private void setGateShutdownTaskId(final int gateShutdownTaskId) {
         this.gateShutdownTaskId = gateShutdownTaskId;
     }
-
+    
     public void setGateSignPowered(final boolean gateSignPowered) {
         this.gateSignPowered = gateSignPowered;
     }
-
+    
     private void setGateTarget(final Stargate gateTarget) {
         this.gateTarget = gateTarget;
     }
-
+    
     public void setGateTempSignTarget(final long gateTempSignTarget) {
         this.gateTempSignTarget = gateTempSignTarget;
     }
-
+    
     public void setGateTempTargetId(final long gateTempTargetId) {
         this.gateTempTargetId = gateTempTargetId;
     }
-
+    
     public void setGateWorld(final World gateWorld) {
         this.gateWorld = gateWorld;
     }
     
-    public String getLastUsedBy() {
-        return this.lastUsedBy;
-    }
-    
-    public void setLastUsedBy(Player player) {
-        this.setLastUsedBy(player.getName());
-    }
-    
-    public void setLastUsedBy(String playerName) {
-        this.lastUsedBy = playerName;
-    }
-    
-    public String getSourceGateName() {
-        return this.gateSourceName;
-    }
-    
-    public void setSourceGateName(String gateName) {
-        this.gateSourceName = gateName;
-    }
-    
-    public void setGateChevronsLocked(boolean locked) {
-        this.gateChevronsLocked = locked;
-    }
-    
-    public boolean gateChevronsLocked() {
-        return this.gateChevronsLocked;
-    }    
-
     public void setIrisDeactivationCode(final String idc) {
 
         if ((idc != null) && !idc.equals("")) {
@@ -906,7 +985,7 @@ public class Stargate {
             setGateIrisDeactivationCode("");
         }
     }
-
+    
     @SuppressWarnings("deprecation")
 	private void setIrisState(final boolean irisactive) {
         setGateIrisActive(irisactive);
@@ -926,10 +1005,22 @@ public class Stargate {
         if ((getGateIrisLeverBlock() != null) && (getGateIrisLeverBlock().getTypeId() == 69)) {
             getGateIrisLeverBlock().setData(WorldUtils.getLeverToggleByte(getGateIrisLeverBlock().getData(), isGateIrisActive()));
         }
+    }    
+
+    public void setLastUsedBy(Player player) {
+        this.setLastUsedBy(player.getName());
+    }
+
+    public void setLastUsedBy(String playerName) {
+        this.lastUsedBy = playerName;
     }
 
     public void setLoadedVersion(final byte loadedVersion) {
         this.loadedVersion = loadedVersion;
+    }
+
+    public void setSourceGateName(String gateName) {
+        this.gateSourceName = gateName;
     }
 
     @SuppressWarnings("deprecation")
@@ -1032,6 +1123,10 @@ public class Stargate {
         }
     }
 
+    public void setWormholeEstablished(boolean established) {
+        this.gateEstablishedWormhole = established;
+    }
+
     public void shutdownStargate(final boolean timer) {
         if (this.getGateShutdownTaskId() > 0) {
             SGLogger.prettyLog(Level.FINE, false, "Wormhole \"" + getGateName() + "\" ShutdownTaskID \"" + getGateShutdownTaskId() + "\" cancelled.");
@@ -1113,109 +1208,6 @@ public class Stargate {
             setGateAfterShutdownTaskId(-1);
         }
         setGateRecentlyActive(false);
-    }
-
-    public void dialSignClicked() {
-        this.dialSignClicked(null);
-    }
-
-    @SuppressWarnings("deprecation")
-	public void dialSignClicked(Action eventAction) {
-        synchronized (getGateNetwork().getNetworkGateLock()) {
-            //@TODO check if this is still needed
-            getGateDialSignBlock().setTypeIdAndData(Material.WALL_SIGN.getId(), WorldUtils.getSignFacingByteFromBlockFace(getGateFacing()), false);
-            setGateDialSign((Sign) getGateDialSignBlock().getState());
-            getGateDialSign().setLine(0, "-" + getGateName() + "-");
-            
-            String lineMarkerS = ">" + ChatColor.GREEN;
-            String lineMarkerE = ChatColor.BLACK + "<";
-
-            if (getGateNetwork().getNetworkSignGateList().size() <= 1) {
-                getGateDialSign().setLine(1, "");
-                getGateDialSign().setLine(2, ChatColor.DARK_RED + "No Other Gates" + ChatColor.BLACK);
-                getGateDialSign().setLine(3, "");
-                getGateDialSign().update();
-                setGateDialSignTarget(null);
-                return;
-            }
-
-            if (getGateDialSignIndex() == -1) {
-                setGateDialSignIndex(0);
-            }
-
-            int direction = 1;
-            if ((eventAction != null) && (eventAction.equals(Action.RIGHT_CLICK_BLOCK))) {
-                direction = -1;
-            }
-            
-            getGateSignOrder().clear();
-            int orderIndex = 1;
-
-            if (getGateDialSignIndex() > getGateNetwork().getNetworkSignGateList().size()) {
-                setGateDialSignIndex(0);
-            }
-
-            for (int i = 0; i < 4; i++) {
-                if (getGateDialSignIndex() == getGateNetwork().getNetworkSignGateList().size()) {
-                    setGateDialSignIndex(0);
-                }
-
-                if (getGateDialSignIndex() < 0) {
-                    setGateDialSignIndex(getGateNetwork().getNetworkSignGateList().size() - 1);
-                }
-
-                if (getGateNetwork().getNetworkSignGateList().get(getGateDialSignIndex()).getGateName().equals(getGateName())) {
-                    setGateDialSignIndex(getGateDialSignIndex() + direction);
-
-                    if (getGateDialSignIndex() == getGateNetwork().getNetworkSignGateList().size()) {
-                        setGateDialSignIndex(0);
-                    }
-                }
-
-                if (getGateDialSignIndex() >= 0) {
-                    getGateSignOrder().put(orderIndex, getGateNetwork().getNetworkSignGateList().get(getGateDialSignIndex()));
-                    orderIndex++;
-
-                    setGateDialSignIndex(getGateDialSignIndex() + direction);
-                }
-            }
-
-            //@TODO: remove debug
-            //System.out.println(getGateNetwork().getNetworkName() + " size: " + getGateNetwork().getNetworkSignGateList().size());
-            //for (Stargate s: getGateNetwork().getNetworkSignGateList()) {
-            //    System.out.println(s.getGateDialSignIndex() + ": " + s.getGateName());
-            //}
-
-            String line1 = "";
-            String line2 = "";
-            String line3 = "";
-            String lineTemp = "";
-
-            if (getGateNetwork().getNetworkSignGateList().size() >= 2) {
-                line2 = lineMarkerS + getGateSignOrder().get(2).getGateName() + lineMarkerE;
-            } else {
-                line2 = lineMarkerS + getGateSignOrder().get(1).getGateName() + lineMarkerE;
-            }
-
-            if (getGateNetwork().getNetworkSignGateList().size() > 2) {
-                line1 = getGateSignOrder().get(1).getGateName();
-                line3 = getGateSignOrder().get(3).getGateName();
-            }
-
-            setGateDialSignTarget(getGateSignOrder().get(2));
-            setGateDialSignIndex(getGateNetwork().getNetworkSignGateList().indexOf(getGateSignOrder().get(2)));
-
-            if (direction == -1) {
-                lineTemp = line1;
-                line1 = line3;
-                line3 = lineTemp;
-            }
-
-            getGateDialSign().setLine(1, line1);
-            getGateDialSign().setLine(2, line2);
-            getGateDialSign().setLine(3, line3);
-            getGateDialSign().update(true);
-        }
     }
 
     public void timeoutStargate() {

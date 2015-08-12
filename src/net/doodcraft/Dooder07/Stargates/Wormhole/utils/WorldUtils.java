@@ -1,18 +1,19 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.utils;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
-
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.material.Button;
-import org.bukkit.material.Sign;
-
+import java.awt.Button;
 import java.util.logging.Level;
 
+import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
+
 public class WorldUtils {
+
+    @SuppressWarnings("deprecation")
+	public static byte getButtonFacingByteFromBlockFace(final BlockFace blockFace) {
+        Button buttonFacing = new Button(Material.STONE_BUTTON);
+        buttonFacing.setFacingDirection(blockFace);
+
+        return buttonFacing.getData();
+    }
 
     public static Float getDegreesFromBlockFace(final BlockFace blockFace) {
         switch (blockFace) {
@@ -37,14 +38,6 @@ public class WorldUtils {
         return getButtonFacingByteFromBlockFace(blockFace);
     }
 
-    @SuppressWarnings("deprecation")
-	public static byte getButtonFacingByteFromBlockFace(final BlockFace blockFace) {
-        Button buttonFacing = new Button(Material.STONE_BUTTON);
-        buttonFacing.setFacingDirection(blockFace);
-
-        return buttonFacing.getData();
-    }
-
     public static byte getLeverToggleByte(final byte leverState, final boolean isActive) {
         return (byte) (isActive
                 ? (leverState & 0x8) != 0x8
@@ -53,31 +46,6 @@ public class WorldUtils {
                 : (leverState & 0x8) == 0x8
                 ? leverState ^ 0x8
                 : leverState);
-    }
-
-    public static BlockFace getPerpendicularRightDirection(final BlockFace blockFace) {
-        switch (blockFace) {
-            case NORTH:
-            case UP:
-                return BlockFace.EAST;
-            case SOUTH:
-            case DOWN:
-                return BlockFace.WEST;
-            case EAST:
-                return BlockFace.SOUTH;
-            case WEST:
-                return BlockFace.NORTH;
-            case NORTH_EAST:
-                return BlockFace.SOUTH_EAST;
-            case SOUTH_WEST:
-                return BlockFace.NORTH_WEST;
-            case NORTH_WEST:
-                return BlockFace.NORTH_EAST;
-            case SOUTH_EAST:
-                return BlockFace.SOUTH_WEST;
-            default:
-                return blockFace;
-        }
     }
 
     public static BlockFace getPerpendicularLeftDirection(final BlockFace blockFace) {
@@ -100,6 +68,31 @@ public class WorldUtils {
                 return BlockFace.SOUTH_WEST;
             case SOUTH_EAST:
                 return BlockFace.NORTH_EAST;
+            default:
+                return blockFace;
+        }
+    }
+
+    public static BlockFace getPerpendicularRightDirection(final BlockFace blockFace) {
+        switch (blockFace) {
+            case NORTH:
+            case UP:
+                return BlockFace.EAST;
+            case SOUTH:
+            case DOWN:
+                return BlockFace.WEST;
+            case EAST:
+                return BlockFace.SOUTH;
+            case WEST:
+                return BlockFace.NORTH;
+            case NORTH_EAST:
+                return BlockFace.SOUTH_EAST;
+            case SOUTH_WEST:
+                return BlockFace.NORTH_WEST;
+            case NORTH_WEST:
+                return BlockFace.NORTH_EAST;
+            case SOUTH_EAST:
+                return BlockFace.SOUTH_WEST;
             default:
                 return blockFace;
         }

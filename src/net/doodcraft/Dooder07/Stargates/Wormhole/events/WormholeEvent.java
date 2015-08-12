@@ -1,6 +1,6 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.events;
 
-import org.bukkit.event.Event;
+import java.awt.Event;
 
 public abstract class WormholeEvent extends Event {
 

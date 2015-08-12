@@ -1,21 +1,21 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.model;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateHelper;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.configuration.ConfigurationSection;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
+import org.omg.CORBA.Environment;
 
 public class StargateDBManager {
 
@@ -29,14 +29,6 @@ public class StargateDBManager {
     private static volatile PreparedStatement getIndvPermStatement = null;
     private static volatile PreparedStatement getAllIndvPermStatement = null;
 
-    public static Connection getConnection() {
-    	if(!StargateDBManager.isConnected()) {
-    		StargateDBManager.connectDB();
-    	}
-    	
-    	return StargateDBManager.wormholeSQLConnection;
-    }
-    
     private static void connectDB() {
     	
     	String driver = null;
@@ -78,23 +70,7 @@ public class StargateDBManager {
 			e.printStackTrace();
 		}
     }
-
-    public static boolean isConnected() {
-        if (wormholeSQLConnection != null) {
-            try {
-                if (wormholeSQLConnection.isClosed())
-                    return false;
-            } catch (SQLException e) {
-                SGLogger.prettyLog(Level.FINE, false, "DBLink not available.");
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
+    
     public static ConcurrentHashMap<String, PermissionLevel> getAllIndividualPermissions() {
         final ConcurrentHashMap<String, PermissionLevel> perms = new ConcurrentHashMap<String, PermissionLevel>();
         if (!isConnected()) {
@@ -126,6 +102,30 @@ public class StargateDBManager {
             }
         }
         return perms;
+    }
+
+    public static Connection getConnection() {
+    	if(!StargateDBManager.isConnected()) {
+    		StargateDBManager.connectDB();
+    	}
+    	
+    	return StargateDBManager.wormholeSQLConnection;
+    }
+
+    public static boolean isConnected() {
+        if (wormholeSQLConnection != null) {
+            try {
+                if (wormholeSQLConnection.isClosed())
+                    return false;
+            } catch (SQLException e) {
+                SGLogger.prettyLog(Level.FINE, false, "DBLink not available.");
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public static void loadStargates(final Server server) {

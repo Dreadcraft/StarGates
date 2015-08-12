@@ -1,17 +1,22 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.plugin;
 
-import de.luricos.bukkit.WormholeXTreme.Worlds.WormholeXTremeWorlds;
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateDBManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-
-import java.util.logging.Level;
-
 public class WormholeWorldsSupport {
+
+    private static boolean checkWorldsVersion(String version) {
+        if (!isSupportedVersion(version)) {
+            SGLogger.prettyLog(Level.SEVERE, false, "Not a supported version of WormholeXTreme-Worlds. Recommended is > 0.507");
+            return false;
+        }
+
+        return true;
+    }
 
     public static void disableWormholeWorlds() {
         if (StarGates.getWorldHandler() != null) {
@@ -19,11 +24,11 @@ public class WormholeWorldsSupport {
             SGLogger.prettyLog(Level.INFO, false, "Detached from Wormhole Worlds plugin.");
         }
     }
-
+    
     public static void enableWormholeWorlds() {
         enableWormholeWorlds(false);
     }
-    
+
     public static void enableWormholeWorlds(boolean reload) {
         if (ConfigManager.isWormholeWorldsSupportEnabled()) {
             if (!WormholeWorldsSupport.isEnabled()) {
@@ -58,19 +63,14 @@ public class WormholeWorldsSupport {
         }
     }
 
-    private static boolean checkWorldsVersion(String version) {
-        if (!isSupportedVersion(version)) {
-            SGLogger.prettyLog(Level.SEVERE, false, "Not a supported version of WormholeXTreme-Worlds. Recommended is > 0.507");
-            return false;
-        }
-
-        return true;
+    public static boolean isEnabled() {
+        return StarGates.getWorldHandler() != null;
     }
 
     public static boolean isSupportedVersion(String verIn) {
         return isSupportedVersion(verIn, 0.507);
     }
-
+    
     public static boolean isSupportedVersion(String verIn, Double checkVer) {
         String comp1 = verIn.replaceAll("\\.", "");
         int subVCount = verIn.length() - comp1.length();
@@ -85,9 +85,5 @@ public class WormholeWorldsSupport {
         String verOut = verIn.substring(0, firstMatch) + "." + comp1.substring(firstMatch);
 
         return Double.parseDouble(verOut) >= checkVer;
-    }
-    
-    public static boolean isEnabled() {
-        return StarGates.getWorldHandler() != null;
     }
 }

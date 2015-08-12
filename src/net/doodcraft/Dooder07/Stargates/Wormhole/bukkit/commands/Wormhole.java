@@ -1,27 +1,21 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.bukkit.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateHelper;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateDBManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager;
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
-
-import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
 
 public class Wormhole implements CommandExecutor {
 
@@ -165,6 +159,42 @@ public class Wormhole implements CommandExecutor {
 
     }
 
+    public static boolean doFixGates(CommandSender sender, String[] args) {
+        if ((sender instanceof Player) && (!(sender.isOp()))) {
+            sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + ConfigManager.MessageStrings.permissionNo);
+            return false;
+        }
+
+        final ArrayList<Stargate> gates = StargateManager.getAllGates();
+        if (args.length >= 2) {
+            Stargate gate = StargateManager.getStargate(args[1]);
+            if (gate != null) {
+                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Set GateFace of '" + args[1] + "' to " + WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
+                gate.setGateFacing(WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
+                StargateDBManager.stargateToSQL(gate);
+            } else {
+                sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Gate '" + args[0] + "' not found in database");
+            }
+        } else {
+		
+            for (final Stargate gate : gates) {
+                SGLogger.prettyLog(Level.INFO,false,"Fixing saved gate '" + gate.getGateName() + "', Current GateFace: " + gate.getGateFacing().name());
+                if (gate.isGateActive() || gate.isGateLightsActive()) {
+                    gate.shutdownStargate(false);
+                }
+                gate.setGateFacing(WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
+                SGLogger.prettyLog(Level.INFO, false, "Set facing to '" + gate.getGateFacing() +"'");
+
+                StargateDBManager.stargateToSQL(gate);
+                SGLogger.prettyLog(Level.INFO, false, "Saving gate: '" + gate.getGateName() + "', GateFace: '" + gate.getGateFacing().name() + "'");
+            }
+
+            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "All existing Stargates are now fully operational.");
+        }
+
+        return true;
+    }
+
     private static boolean doIrisMaterial(final CommandSender sender, final String[] args) {
         if ((args.length == 3) || (args.length == 2)) {
             if (StargateManager.isStargate(args[1])) {
@@ -245,6 +275,30 @@ public class Wormhole implements CommandExecutor {
             sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Valid materials are: GLOWSTONE, SEA_LANTERN, GLOWING_REDSTONE_ORE");
             return false;
         }
+    }
+
+    public static boolean doLogging(CommandSender sender, String[] args) {
+        if (args.length >= 1) {
+            if (args.length >= 2) {
+                String logLevel = args[1];
+
+                if (logLevel != null || !"".equals(logLevel)) {
+                    List<String> allowedArgs = new ArrayList<String>(Arrays.asList("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST"));
+                    if (allowedArgs.indexOf(logLevel.toUpperCase()) != -1) {
+                        ConfigManager.setDebugLevel(args[1]);
+                        SGLogger.setLogLevel(Level.parse(args[1]));
+                    }
+                }
+                
+                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Logging set to '" + ConfigManager.getLogLevel().getName() + "'. See server.log for detailed log output.");
+                return true;
+            }
+            
+            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Logging is currently set to '" + ConfigManager.getLogLevel().getName() + "'.");
+            return true;
+        }
+        
+        return false;
     }
 
     private static boolean doOwner(final CommandSender sender, final String[] args) {
@@ -459,6 +513,38 @@ public class Wormhole implements CommandExecutor {
         }
     }
 
+    public static boolean doShowInfo(CommandSender sender, String[] args) {
+        final ArrayList<Stargate> gates = StargateManager.getAllGates();
+        if (args.length >= 2) {
+            Stargate gate = StargateManager.getStargate(args[1]);
+            if (gate != null) {
+                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "GateFace for '" + args[1] + "' is set to '" + gate.getGateFacing() + "'");
+            } else {
+                sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Gate '" + args[0] + "' not found in database");
+            }
+        } else {
+            for (final Stargate gate : gates) {
+                if (gate.isGateActive() || gate.isGateLightsActive()) {
+                    gate.shutdownStargate(false);
+                }
+                SGLogger.prettyLog(Level.INFO, false, "GateFace for '" + gate.getGateName() + "' is set to '" + gate.getGateFacing().name() + "'");
+            }
+
+            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Check your console log");
+        }
+
+        return true;
+    }
+
+    public static boolean doShowPermissions(CommandSender sender, String[] args) {
+        if (args.length >= 1) {
+            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Selected Permission-Provider: " + StarGates.getPermissionManager().getBackend().getProviderName());
+            return true;
+        }
+
+        return false;
+    }
+
     private static boolean doShutdownTimeout(final CommandSender sender, final String[] args) {
         if (args.length == 2) {
             try {
@@ -520,7 +606,7 @@ public class Wormhole implements CommandExecutor {
         }
         return true;
     }
-
+    
     private static boolean doWooshDepth(final CommandSender sender, final String[] args) {
         if ((args.length == 3) || (args.length == 2)) {
             if (StargateManager.isStargate(args[1])) {
@@ -559,12 +645,12 @@ public class Wormhole implements CommandExecutor {
             sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Valid depth: 0 - 5");
             return false;
         }
-    }
-
+    }    
+    
     private static boolean isValidGroupName(final String groupName) {
         return groupName.equalsIgnoreCase("one") || groupName.equalsIgnoreCase("two") || groupName.equalsIgnoreCase("three");
     }
-
+    
     private static void setGateCustomAll(final Stargate stargate, final boolean customEnabled) {
         if (stargate.getGateShape() != null) {
             if (customEnabled) {
@@ -603,70 +689,6 @@ public class Wormhole implements CommandExecutor {
         }
     }
 
-    public static boolean doLogging(CommandSender sender, String[] args) {
-        if (args.length >= 1) {
-            if (args.length >= 2) {
-                String logLevel = args[1];
-
-                if (logLevel != null || !"".equals(logLevel)) {
-                    List<String> allowedArgs = new ArrayList<String>(Arrays.asList("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST"));
-                    if (allowedArgs.indexOf(logLevel.toUpperCase()) != -1) {
-                        ConfigManager.setDebugLevel(args[1]);
-                        SGLogger.setLogLevel(Level.parse(args[1]));
-                    }
-                }
-                
-                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Logging set to '" + ConfigManager.getLogLevel().getName() + "'. See server.log for detailed log output.");
-                return true;
-            }
-            
-            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Logging is currently set to '" + ConfigManager.getLogLevel().getName() + "'.");
-            return true;
-        }
-        
-        return false;
-    }
-    
-    public static boolean toggleShowGWM(CommandSender sender, String[] args, boolean getValue) {
-        if (args.length >= 1) {
-            if (sender instanceof Player) {
-                if (!getValue) {
-                    if (ConfigManager.isGateArrivalWelcomeMessageEnabled()) {
-                        ConfigManager.setShowGWM(false);
-                    } else {
-                        ConfigManager.setShowGWM(true);
-                    }
-                }
-                
-                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "GATE_WELCOME_MESSAGE '" + (ConfigManager.isGateArrivalWelcomeMessageEnabled() ? "\u00A72enabled" : "\u00A74disabled") + ConfigManager.MessageStrings.messageColor + "'.");
-            }
-            
-            return true;
-        }
-        
-        return false;
-    }    
-    
-    public static boolean toggleTransportMethod(CommandSender sender, String[] args, boolean getValue) {
-        if (args.length >= 1) {
-            if (sender instanceof Player) {
-                if (!getValue) {
-                    if (ConfigManager.getGateTransportMethod()) {
-                        ConfigManager.setGateTransportMethod(false);
-                    } else {
-                        ConfigManager.setGateTransportMethod(true);
-                    }
-                }
-                
-                sender.sendMessage(String.format(ConfigManager.MessageStrings.normalHeader.toString() + "Transportation method %s '" + (ConfigManager.getGateTransportMethod() ? "EVENT" : "TELEPORT") + "'.", ((getValue) ? "is" : "changed to")));
-            }
-            
-            return true;
-        }
-        
-        return false;
-    }
-    
     public static boolean setWormholeKickbackBlockCount(CommandSender sender, String[] args) {
         if (args.length >= 1) {
             if (sender instanceof Player) {
@@ -691,72 +713,44 @@ public class Wormhole implements CommandExecutor {
         return false;
     }
 
-    public static boolean doShowPermissions(CommandSender sender, String[] args) {
+    public static boolean toggleShowGWM(CommandSender sender, String[] args, boolean getValue) {
         if (args.length >= 1) {
-            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Selected Permission-Provider: " + StarGates.getPermissionManager().getBackend().getProviderName());
+            if (sender instanceof Player) {
+                if (!getValue) {
+                    if (ConfigManager.isGateArrivalWelcomeMessageEnabled()) {
+                        ConfigManager.setShowGWM(false);
+                    } else {
+                        ConfigManager.setShowGWM(true);
+                    }
+                }
+                
+                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "GATE_WELCOME_MESSAGE '" + (ConfigManager.isGateArrivalWelcomeMessageEnabled() ? "\u00A72enabled" : "\u00A74disabled") + ConfigManager.MessageStrings.messageColor + "'.");
+            }
+            
             return true;
         }
-
+        
         return false;
     }
 
-    public static boolean doFixGates(CommandSender sender, String[] args) {
-        if ((sender instanceof Player) && (!(sender.isOp()))) {
-            sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + ConfigManager.MessageStrings.permissionNo);
-            return false;
-        }
-
-        final ArrayList<Stargate> gates = StargateManager.getAllGates();
-        if (args.length >= 2) {
-            Stargate gate = StargateManager.getStargate(args[1]);
-            if (gate != null) {
-                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Set GateFace of '" + args[1] + "' to " + WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
-                gate.setGateFacing(WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
-                StargateDBManager.stargateToSQL(gate);
-            } else {
-                sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Gate '" + args[0] + "' not found in database");
-            }
-        } else {
-		
-            for (final Stargate gate : gates) {
-                SGLogger.prettyLog(Level.INFO,false,"Fixing saved gate '" + gate.getGateName() + "', Current GateFace: " + gate.getGateFacing().name());
-                if (gate.isGateActive() || gate.isGateLightsActive()) {
-                    gate.shutdownStargate(false);
+    public static boolean toggleTransportMethod(CommandSender sender, String[] args, boolean getValue) {
+        if (args.length >= 1) {
+            if (sender instanceof Player) {
+                if (!getValue) {
+                    if (ConfigManager.getGateTransportMethod()) {
+                        ConfigManager.setGateTransportMethod(false);
+                    } else {
+                        ConfigManager.setGateTransportMethod(true);
+                    }
                 }
-                gate.setGateFacing(WorldUtils.getPerpendicularLeftDirection(gate.getGateFacing()));
-                SGLogger.prettyLog(Level.INFO, false, "Set facing to '" + gate.getGateFacing() +"'");
-
-                StargateDBManager.stargateToSQL(gate);
-                SGLogger.prettyLog(Level.INFO, false, "Saving gate: '" + gate.getGateName() + "', GateFace: '" + gate.getGateFacing().name() + "'");
+                
+                sender.sendMessage(String.format(ConfigManager.MessageStrings.normalHeader.toString() + "Transportation method %s '" + (ConfigManager.getGateTransportMethod() ? "EVENT" : "TELEPORT") + "'.", ((getValue) ? "is" : "changed to")));
             }
-
-            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "All existing Stargates are now fully operational.");
+            
+            return true;
         }
-
-        return true;
-    }
-
-    public static boolean doShowInfo(CommandSender sender, String[] args) {
-        final ArrayList<Stargate> gates = StargateManager.getAllGates();
-        if (args.length >= 2) {
-            Stargate gate = StargateManager.getStargate(args[1]);
-            if (gate != null) {
-                sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "GateFace for '" + args[1] + "' is set to '" + gate.getGateFacing() + "'");
-            } else {
-                sender.sendMessage(ConfigManager.MessageStrings.errorHeader.toString() + "Gate '" + args[0] + "' not found in database");
-            }
-        } else {
-            for (final Stargate gate : gates) {
-                if (gate.isGateActive() || gate.isGateLightsActive()) {
-                    gate.shutdownStargate(false);
-                }
-                SGLogger.prettyLog(Level.INFO, false, "GateFace for '" + gate.getGateName() + "' is set to '" + gate.getGateFacing().name() + "'");
-            }
-
-            sender.sendMessage(ConfigManager.MessageStrings.normalHeader.toString() + "Check your console log");
-        }
-
-        return true;
+        
+        return false;
     }
 
     @Override

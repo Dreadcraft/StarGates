@@ -1,18 +1,15 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.player;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.exceptions.WormholePlayerEmptyStargateNameException;
 import net.doodcraft.Dooder07.Stargates.Wormhole.exceptions.WormholePlayerNullPointerException;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.ArrayList;
 
 public class WormholePlayer extends LocalPlayer {
     
@@ -25,46 +22,37 @@ public class WormholePlayer extends LocalPlayer {
         super(player);
     }
 
-    public void resetPlayer() {
-        SGLogger.prettyLog(Level.FINE, false, "Resetting player '" + this.getName() + "'");
-        for (Stargate s : this.getStargates()) {
-            this.removeStargate(s.getGateName());
-            this.removeProperty(s.getGateName());
-        }
+    private void addProperties(String stargateName) {
+        SGLogger.prettyLog(Level.FINE, false, "Adding properties for gate '" + stargateName + "' to player '" + getName() + "'");
+        usageProperties.put(stargateName, new WormholePlayerUsageProperties());
     }
     
-    @Override
-    public String getName() {
-        return this.player.getName();
+    public void addStargate(Stargate stargate) {
+        if (this.hasStargate(stargate)) {
+            SGLogger.prettyLog(Level.FINE, false, "Stargate '" + stargate.getGateName() + "' was already added for player '" + getName() + "'");
+            this.setCurrentGateName(stargate.getGateName());
+            return;
+        }
+        
+        SGLogger.prettyLog(Level.FINE, false, "Adding Stargate '" + stargate.getGateName() + "' to player '" + getName() + "'");
+        stargateMap.put(stargate.getGateName(), stargate);
+        this.addProperties(stargate.getGateName());
+        this.setCurrentGateName(stargate.getGateName());
     }
 
+    public String getCurrentGateName() {
+        return this.currentGateName;
+    }
+    
     @Override
     public String getDisplayName() {
         return this.player.getDisplayName();
     }
     
-    public Player getPlayer() {
-        return this.player;
+    public int getGateCount() {
+        return stargateMap.keySet().size();
     }
     
-    public WormholePlayerUsageProperties getProperties() {
-        if (!"".equals(this.getCurrentGateName()))
-            return this.getProperties(this.getCurrentGateName());
-        
-        return null;
-    }
-    
-    public WormholePlayerUsageProperties getProperties(Stargate stargate) {
-        return this.getProperties(stargate.getGateName());
-    }
-    
-    public WormholePlayerUsageProperties getProperties(String gateName) {
-        if (this.hasStargate(gateName))
-            return usageProperties.get(gateName);
-        
-        return new WormholePlayerUsageProperties();
-    }
-
     public PlayerOrientation getKickBackDirection(BlockFace facing) {
         return this.getKickBackDirection(null, facing);
     }
@@ -72,7 +60,7 @@ public class WormholePlayer extends LocalPlayer {
     public PlayerOrientation getKickBackDirection(PlayerOrientation direction) {
         return this.getKickBackDirection(direction, null);
     }
-    
+
     private PlayerOrientation getKickBackDirection(PlayerOrientation direction, BlockFace facing) {
         if ((this.isOnline()) && ((direction != null) || (facing != null))) {
             SGLogger.prettyLog(Level.FINE, false, "PlayerDirection: " + this.getCardinalDirection() + ", BlockFacing: " + facing);
@@ -112,31 +100,38 @@ public class WormholePlayer extends LocalPlayer {
         return null;
     }
     
+    @Override
+    public String getName() {
+        return this.player.getName();
+    }
+    
+    public Player getPlayer() {
+        return this.player;
+    }
+    
+    public WormholePlayerUsageProperties getProperties() {
+        if (!"".equals(this.getCurrentGateName()))
+            return this.getProperties(this.getCurrentGateName());
+        
+        return null;
+    }
+    
+    public WormholePlayerUsageProperties getProperties(Stargate stargate) {
+        return this.getProperties(stargate.getGateName());
+    }
+    
+    public WormholePlayerUsageProperties getProperties(String gateName) {
+        if (this.hasStargate(gateName))
+            return usageProperties.get(gateName);
+        
+        return new WormholePlayerUsageProperties();
+    }
+    
     public Stargate getStargate() {
         if (!"".equalsIgnoreCase(this.getCurrentGateName()))
             return this.getStargate(this.getCurrentGateName());
         
         return null;
-    }
-    
-    public List<Stargate> getStargates() {
-        List<Stargate> stargates = new ArrayList<Stargate>();
-        for (Stargate s : stargateMap.values())
-            stargates.add(s);
-        
-        return stargates;
-    }
-    
-    public void setCurrentGateName(String gateName) {
-        if (gateName == null)
-            gateName = "";
-        
-        SGLogger.prettyLog(Level.FINE, false, "Setting current used gateName to '" + gateName + "' for player '" + getName() + "'");
-        this.currentGateName = gateName;
-    }
-    
-    public String getCurrentGateName() {
-        return this.currentGateName;
     }
     
     public Stargate getStargate(String gateName) {
@@ -149,6 +144,14 @@ public class WormholePlayer extends LocalPlayer {
         return new Stargate();
     }
 
+    public List<Stargate> getStargates() {
+        List<Stargate> stargates = new ArrayList<Stargate>();
+        for (Stargate s : stargateMap.values())
+            stargates.add(s);
+        
+        return stargates;
+    }
+    
     public boolean hasStargate(Stargate stargate) {
         return this.hasStargate(stargate.getGateName());
     }
@@ -167,22 +170,9 @@ public class WormholePlayer extends LocalPlayer {
         return false;
     }
     
-    public void addStargate(Stargate stargate) {
-        if (this.hasStargate(stargate)) {
-            SGLogger.prettyLog(Level.FINE, false, "Stargate '" + stargate.getGateName() + "' was already added for player '" + getName() + "'");
-            this.setCurrentGateName(stargate.getGateName());
-            return;
-        }
-        
-        SGLogger.prettyLog(Level.FINE, false, "Adding Stargate '" + stargate.getGateName() + "' to player '" + getName() + "'");
-        stargateMap.put(stargate.getGateName(), stargate);
-        this.addProperties(stargate.getGateName());
-        this.setCurrentGateName(stargate.getGateName());
-    }
-    
-    private void addProperties(String stargateName) {
-        SGLogger.prettyLog(Level.FINE, false, "Adding properties for gate '" + stargateName + "' to player '" + getName() + "'");
-        usageProperties.put(stargateName, new WormholePlayerUsageProperties());
+    private void removeProperty(String gateName) {
+        SGLogger.prettyLog(Level.FINE, false, "Removing property for Stargate '" + gateName + "' from player '" + getName() + "'");
+        usageProperties.remove(gateName);
     }
 
     public void removeStargate(Stargate stargate) {
@@ -220,17 +210,24 @@ public class WormholePlayer extends LocalPlayer {
         }
     }
     
-    private void removeProperty(String gateName) {
-        SGLogger.prettyLog(Level.FINE, false, "Removing property for Stargate '" + gateName + "' from player '" + getName() + "'");
-        usageProperties.remove(gateName);
-    }
-    
-    public int getGateCount() {
-        return stargateMap.keySet().size();
+    public void resetPlayer() {
+        SGLogger.prettyLog(Level.FINE, false, "Resetting player '" + this.getName() + "'");
+        for (Stargate s : this.getStargates()) {
+            this.removeStargate(s.getGateName());
+            this.removeProperty(s.getGateName());
+        }
     }
     
     public void sendMessage(String message) {
         if (this.player.isOnline())
             this.getPlayer().sendMessage(message);
+    }
+    
+    public void setCurrentGateName(String gateName) {
+        if (gateName == null)
+            gateName = "";
+        
+        SGLogger.prettyLog(Level.FINE, false, "Setting current used gateName to '" + gateName + "' for player '" + getName() + "'");
+        this.currentGateName = gateName;
     }
 }

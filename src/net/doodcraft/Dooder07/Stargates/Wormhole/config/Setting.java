@@ -1,11 +1,9 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.config;
 
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager.ConfigKeys;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
-
-import org.bukkit.Material;
-
-import java.util.logging.Level;
 
 public class Setting {
 

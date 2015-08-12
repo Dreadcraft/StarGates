@@ -1,15 +1,11 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.permissions.backends;
 
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionBackend;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
-import java.util.logging.Level;
 
 
 public class PermissionsExSupport extends PermissionBackend {
@@ -18,6 +14,11 @@ public class PermissionsExSupport extends PermissionBackend {
 
     public PermissionsExSupport(net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionManager manager, ConfigManager config, String providerName) {
         super(manager, config, providerName);
+    }
+
+    @Override
+    public boolean hasPermission(Player player, String permissionString) {
+        return provider.has(player, permissionString);
     }
 
     @Override
@@ -45,10 +46,5 @@ public class PermissionsExSupport extends PermissionBackend {
     public void reload() {
         provider = null;
         SGLogger.prettyLog(Level.INFO, false, "Detached from Permissions plugin '" + getProviderName() + "'.");
-    }
-
-    @Override
-    public boolean hasPermission(Player player, String permissionString) {
-        return provider.has(player, permissionString);
     }
 }

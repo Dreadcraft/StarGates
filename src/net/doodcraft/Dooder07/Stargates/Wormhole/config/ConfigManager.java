@@ -1,11 +1,9 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.config;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
-
-import org.bukkit.plugin.PluginDescriptionFile;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.PermissionsManager.PermissionLevel;
 
 public class ConfigManager {
 
@@ -78,12 +76,6 @@ public class ConfigManager {
 
     private static final ConcurrentHashMap<ConfigKeys, Setting> configurations = new ConcurrentHashMap<ConfigKeys, Setting>();
 
-    public static String getPermissionBackend() {
-        return isConfigurationKey(ConfigKeys.PERMISSIONS_BACKEND)
-                ? getSetting(ConfigKeys.PERMISSIONS_BACKEND).getStringValue()
-                : "bukkit";
-    }
-
     public static int getBuildRestrictionGroupOne() {
         return isConfigurationKey(ConfigKeys.BUILD_RESTRICTION_GROUP_ONE)
                 ? getSetting(ConfigKeys.BUILD_RESTRICTION_GROUP_ONE).getIntValue()
@@ -124,6 +116,15 @@ public class ConfigManager {
         return configurations;
     }
 
+    public static boolean getGateTransportMethod() {
+        Setting tm;
+        if ((tm = ConfigManager.getConfigurations().get(ConfigKeys.USE_EVENT_OR_TP_TRANSPORT)) != null) {
+            return tm.getBooleanValue();
+        }
+        
+        return true;
+    }
+
     public static boolean getHelpSupportDisable() {
         Setting hsd;
         return (hsd = ConfigManager.getConfigurations().get(ConfigKeys.HELP_SUPPORT_DISABLE)) != null && hsd.getBooleanValue();
@@ -138,51 +139,21 @@ public class ConfigManager {
         return Level.INFO;
     }
 
-    public static boolean isGateArrivalWelcomeMessageEnabled() {
-        Setting wme;
-        if ((wme = ConfigManager.getConfigurations().get(ConfigKeys.SHOW_GATE_WELCOME_MESSAGE)) != null) {
-            return wme.getBooleanValue();
-        }
-        
-        return true;
+    public static String getPermissionBackend() {
+        return isConfigurationKey(ConfigKeys.PERMISSIONS_BACKEND)
+                ? getSetting(ConfigKeys.PERMISSIONS_BACKEND).getStringValue()
+                : "bukkit";
     }
     
-    public static void setShowGWM(final boolean g) {
-        ConfigManager.setConfigValue(ConfigKeys.SHOW_GATE_WELCOME_MESSAGE, g);
-    }
-    
-    public static boolean getGateTransportMethod() {
-        Setting tm;
-        if ((tm = ConfigManager.getConfigurations().get(ConfigKeys.USE_EVENT_OR_TP_TRANSPORT)) != null) {
-            return tm.getBooleanValue();
-        }
-        
-        return true;
-    }
-    
-    public static void setGateTransportMethod(boolean tm) {
-        ConfigManager.setConfigValue(ConfigKeys.USE_EVENT_OR_TP_TRANSPORT, tm);
-    }
-    
-    public static int getWormholeKickbackBlockCount() {
-        return isConfigurationKey(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT)
-                ? getSetting(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT).getIntValue()
-                : 2;
-    }
-    
-    public static void setWormholeKickbackBlockCount(int wkbCount) {
-        ConfigManager.setConfigValue(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT, wkbCount);
-    }
-
     public static boolean getPermissionsSupportDisable() {
         Setting psd;
         return (psd = ConfigManager.getConfigurations().get(ConfigKeys.PERMISSIONS_SUPPORT_DISABLE)) != null && psd.getBooleanValue();
     }
-
+    
     private static Setting getSetting(final ConfigKeys configKey) {
         return getConfigurations().get(configKey);
     }
-
+    
     public static boolean getSimplePermissions() {
         Setting sp;
         if ((sp = ConfigManager.getConfigurations().get(ConfigKeys.SIMPLE_PERMISSIONS)) != null) {
@@ -191,7 +162,7 @@ public class ConfigManager {
             return false;
         }
     }
-
+    
     public static int getTimeoutActivate() {
         Setting ta;
         if ((ta = ConfigManager.getConfigurations().get(ConfigKeys.TIMEOUT_ACTIVATE)) != null) {
@@ -200,7 +171,7 @@ public class ConfigManager {
             return 30;
         }
     }
-
+    
     public static int getTimeoutShutdown() {
         Setting ts;
         if ((ts = ConfigManager.getConfigurations().get(ConfigKeys.TIMEOUT_SHUTDOWN)) != null) {
@@ -228,6 +199,12 @@ public class ConfigManager {
                 : 30;
     }
 
+    public static int getWormholeKickbackBlockCount() {
+        return isConfigurationKey(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT)
+                ? getSetting(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT).getIntValue()
+                : 2;
+    }
+
     public static boolean getWormholeUseIsTeleport() {
         Setting bipe;
         if ((bipe = ConfigManager.getConfigurations().get(ConfigKeys.WORMHOLE_USE_IS_TELEPORT)) != null) {
@@ -243,6 +220,15 @@ public class ConfigManager {
 
     private static boolean isConfigurationKey(final ConfigKeys configKey) {
         return getConfigurations().containsKey(configKey);
+    }
+
+    public static boolean isGateArrivalWelcomeMessageEnabled() {
+        Setting wme;
+        if ((wme = ConfigManager.getConfigurations().get(ConfigKeys.SHOW_GATE_WELCOME_MESSAGE)) != null) {
+            return wme.getBooleanValue();
+        }
+        
+        return true;
     }
 
     public static boolean isUseCooldownEnabled() {
@@ -280,6 +266,22 @@ public class ConfigManager {
         }
     }
 
+    public static void setDebugLevel(final String level) {
+        setConfigValue(ConfigKeys.LOG_LEVEL, level.toUpperCase());
+    }
+
+    public static void setGateTransportMethod(boolean tm) {
+        ConfigManager.setConfigValue(ConfigKeys.USE_EVENT_OR_TP_TRANSPORT, tm);
+    }
+
+    public static void setPermissionBackend(String backendName) {
+        setConfigValue(ConfigKeys.PERMISSIONS_BACKEND, backendName);
+    }
+
+    public static void setShowGWM(final boolean g) {
+        ConfigManager.setConfigValue(ConfigKeys.SHOW_GATE_WELCOME_MESSAGE, g);
+    }
+
     public static void setSimplePermissions(final boolean b) {
         ConfigManager.setConfigValue(ConfigKeys.SIMPLE_PERMISSIONS, b);
     }
@@ -307,16 +309,12 @@ public class ConfigManager {
     public static void setUseCooldownGroupThree(final int time) {
         setConfigValue(ConfigKeys.USE_COOLDOWN_GROUP_THREE, time);
     }
-
+    
     public static void setUseCooldownGroupTwo(final int time) {
         setConfigValue(ConfigKeys.USE_COOLDOWN_GROUP_TWO, time);
     }
-    
-    public static void setDebugLevel(final String level) {
-        setConfigValue(ConfigKeys.LOG_LEVEL, level.toUpperCase());
-    }
 
-    public static void setPermissionBackend(String backendName) {
-        setConfigValue(ConfigKeys.PERMISSIONS_BACKEND, backendName);
+    public static void setWormholeKickbackBlockCount(int wkbCount) {
+        ConfigManager.setConfigValue(ConfigKeys.WORMHOLE_KICKBACK_BLOCK_COUNT, wkbCount);
     }
 }

@@ -1,27 +1,15 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.listeners;
 
+import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-
-import java.util.logging.Level;
 
 public class StarGatesBlockListener implements Listener {
 

@@ -3,9 +3,6 @@ package net.doodcraft.Dooder07.Stargates.Wormhole.permissions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.events.WormholeSystemEvent;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 public class PermissionManager {
 
     protected PermissionBackend backend = null;
@@ -14,6 +11,30 @@ public class PermissionManager {
     public PermissionManager(ConfigManager configManager) {
         this.configManager = configManager;
         this.initBackend();
+    }
+
+    protected void callEvent(WormholeSystemEvent event) {
+        Bukkit.getServer().getPluginManager().callEvent(event);
+    }
+
+    protected void callEvent(WormholeSystemEvent.Action action) {
+        this.callEvent(new WormholeSystemEvent(action));
+    }
+
+    public void end() {
+        reset();
+    }
+
+    public PermissionBackend getBackend() {
+        return this.backend;
+    }
+
+    public boolean has(Player player, String permissionString) {
+        return backend.has(player, permissionString);
+    }
+
+    public boolean hasPermission(Player player, String permissionString) {
+        return backend.hasPermission(player, permissionString);
     }
 
     private void initBackend() {
@@ -28,8 +49,12 @@ public class PermissionManager {
         this.setBackend(backendName);
     }
 
-    public PermissionBackend getBackend() {
-        return this.backend;
+    public void reset() {
+        if (this.backend != null) {
+            this.backend.reload();
+        }
+
+        this.callEvent(WormholeSystemEvent.Action.RELOADED);
     }
 
     public void setBackend(String backendName) {
@@ -39,33 +64,5 @@ public class PermissionManager {
         }
 
         this.callEvent(WormholeSystemEvent.Action.PERMISSION_BACKEND_CHANGED);
-    }
-
-    protected void callEvent(WormholeSystemEvent event) {
-        Bukkit.getServer().getPluginManager().callEvent(event);
-    }
-
-    protected void callEvent(WormholeSystemEvent.Action action) {
-        this.callEvent(new WormholeSystemEvent(action));
-    }
-
-    public void reset() {
-        if (this.backend != null) {
-            this.backend.reload();
-        }
-
-        this.callEvent(WormholeSystemEvent.Action.RELOADED);
-    }
-
-    public void end() {
-        reset();
-    }
-
-    public boolean has(Player player, String permissionString) {
-        return backend.has(player, permissionString);
-    }
-
-    public boolean hasPermission(Player player, String permissionString) {
-        return backend.hasPermission(player, permissionString);
     }
 }

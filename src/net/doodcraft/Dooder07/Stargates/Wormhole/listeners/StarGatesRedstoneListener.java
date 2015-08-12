@@ -1,19 +1,10 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.listeners;
 
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-
-import java.util.logging.Level;
 
 public class StarGatesRedstoneListener implements Listener {
 
@@ -23,6 +14,11 @@ public class StarGatesRedstoneListener implements Listener {
 
     private static boolean isCurrentOn(final int oldCurrent, final int newCurrent) {
         return (newCurrent > 0) && (oldCurrent == 0);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onBlockFromToEvent(BlockFromToEvent event) {
+        SGLogger.prettyLog(Level.FINE, false, "We got a BlockFromToEvent here: " + event.getToBlock());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -55,10 +51,5 @@ public class StarGatesRedstoneListener implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onBlockFromToEvent(BlockFromToEvent event) {
-        SGLogger.prettyLog(Level.FINE, false, "We got a BlockFromToEvent here: " + event.getToBlock());
     }
 }

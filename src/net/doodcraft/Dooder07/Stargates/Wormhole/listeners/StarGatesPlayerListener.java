@@ -1,33 +1,23 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.listeners;
 
+import java.awt.Button;
+import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateHelper;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateShape;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.PlayerOrientation;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayer;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
-import org.bukkit.material.Button;
-import org.bukkit.material.Lever;
-
-import java.util.logging.Level;
 
 public class StarGatesPlayerListener implements Listener {
 
@@ -291,13 +281,6 @@ public class StarGatesPlayerListener implements Listener {
         return false;
     }
 
-    private boolean hasChangedBlockCoordinates(final Location fromLoc, final Location toLoc) {
-        return !(fromLoc.getWorld().equals(toLoc.getWorld())
-                && fromLoc.getBlockX() == toLoc.getBlockX()
-                && fromLoc.getBlockY() == toLoc.getBlockY()
-                && fromLoc.getBlockZ() == toLoc.getBlockZ());
-    }
-
     @SuppressWarnings({ "deprecation", "incomplete-switch" })
 	protected WormholePlayer handlePlayerMoveEvent(PlayerMoveEvent event) {
         Player player = event.getPlayer();
@@ -369,19 +352,19 @@ public class StarGatesPlayerListener implements Listener {
                         switch (direction) {
                             case NORTH:
                                 SGLogger.prettyLog(Level.FINE, false, "NORTH: " + pLocZ + " - 2 = " + (pLocX-2d));
-                                pLocZ -= (double) wkbCount;
+                                pLocZ -= wkbCount;
                                 break;
                             case SOUTH:
                                 SGLogger.prettyLog(Level.FINE, false, "SOUTH: " + pLocZ + " + 2 = " + (pLocX+2d));
-                                pLocZ += (double) wkbCount;
+                                pLocZ += wkbCount;
                                 break;                        
                             case EAST:
                                 SGLogger.prettyLog(Level.FINE, false, "EAST: " + pLocX + " + 2 = " + (pLocZ-2d));
-                                pLocX += (double) wkbCount;
+                                pLocX += wkbCount;
                                 break;
                             case WEST:
                                 SGLogger.prettyLog(Level.FINE, false, "WEST: " + pLocX + " - 2 = " + (pLocZ+2d));
-                                pLocX -= (double) wkbCount;
+                                pLocX -= wkbCount;
                                 break;
                         }
 
@@ -436,6 +419,13 @@ public class StarGatesPlayerListener implements Listener {
         return null;
     }
 
+    private boolean hasChangedBlockCoordinates(final Location fromLoc, final Location toLoc) {
+        return !(fromLoc.getWorld().equals(toLoc.getWorld())
+                && fromLoc.getBlockX() == toLoc.getBlockX()
+                && fromLoc.getBlockY() == toLoc.getBlockY()
+                && fromLoc.getBlockZ() == toLoc.getBlockZ());
+    }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         if (!event.isCancelled()) {
@@ -479,6 +469,23 @@ public class StarGatesPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        SGLogger.prettyLog(Level.FINE, false, "Player '" + player.getName() + "' joined the server. Adding player to keyring.");
+        WormholePlayerManager.registerPlayer(player);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerKick(PlayerKickEvent event) {
+
+        Player player = event.getPlayer();
+
+        SGLogger.prettyLog(Level.FINE, false, "Player '" + player.getName() + "' was kicked. Removing player from keyring.");
+        WormholePlayerManager.unregisterPlayer(player);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent event) {
 
         if (!this.hasChangedBlockCoordinates(event.getFrom(), event.getTo())) {
@@ -507,28 +514,11 @@ public class StarGatesPlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        SGLogger.prettyLog(Level.FINE, false, "Player '" + player.getName() + "' joined the server. Adding player to keyring.");
-        WormholePlayerManager.registerPlayer(player);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerQuit(PlayerQuitEvent event) {
 
         Player player = event.getPlayer();
 
         SGLogger.prettyLog(Level.FINE, false, "Player '" + player.getName() + "' quit. Removing player from keyring.");
-        WormholePlayerManager.unregisterPlayer(player);
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onPlayerKick(PlayerKickEvent event) {
-
-        Player player = event.getPlayer();
-
-        SGLogger.prettyLog(Level.FINE, false, "Player '" + player.getName() + "' was kicked. Removing player from keyring.");
         WormholePlayerManager.unregisterPlayer(player);
     }
 }

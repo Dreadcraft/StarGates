@@ -1,21 +1,11 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.player;
 
-import org.bukkit.entity.Player;
 
 public abstract class LocalPlayer {
     protected Player player = null;
     
     protected LocalPlayer(Player player) {
         this.player = player;
-    }
-    
-    public abstract String getName();
-    
-    public abstract String getDisplayName();
-    
-    public boolean isOnline() {
-        return this.player.isOnline();
-
     }
     
     public PlayerOrientation getCardinalDirection() {
@@ -49,5 +39,14 @@ public abstract class LocalPlayer {
         } else {
             return null;
         }
+    }
+    
+    public abstract String getDisplayName();
+    
+    public abstract String getName();
+    
+    public boolean isOnline() {
+        return this.player.isOnline();
+
     }    
 }

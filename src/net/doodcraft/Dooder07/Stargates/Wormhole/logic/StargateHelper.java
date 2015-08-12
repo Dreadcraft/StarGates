@@ -1,19 +1,5 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.logic;
 
-import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
-import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable.ActionToTake;
-import net.doodcraft.Dooder07.Stargates.Wormhole.model.*;
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.DataUtils;
-import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
+import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
+import net.doodcraft.Dooder07.Stargates.Wormhole.logic.StargateUpdateRunnable.ActionToTake;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate3DShape;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateNetwork;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateShape;
+import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateShapeLayer;
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.DataUtils;
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
+import net.doodcraft.Dooder07.Stargates.Wormhole.utils.WorldUtils;
 
 public class StargateHelper {
 
@@ -412,6 +412,14 @@ public class StargateHelper {
         return w.getBlockAt(blockLocation[0] + lowerCorner[0], blockLocation[1] + lowerCorner[1], blockLocation[2] + lowerCorner[2]);
     }
 
+    public static List<String> getShapeNames() {
+        List<String> shapeNames = new ArrayList<String>();
+        for (String shapeName: getStargateShapes().keySet()) {
+            shapeNames.add(getStargateShapeName(shapeName));
+        }
+        return shapeNames;
+    }
+
     public static StargateShape getStargateShape(String shapeName) {
         shapeName = shapeName.toLowerCase();
         if (!getStargateShapes().containsKey(shapeName)) {
@@ -434,14 +442,6 @@ public class StargateHelper {
         return stargateShapes;
     }
 
-    public static List<String> getShapeNames() {
-        List<String> shapeNames = new ArrayList<String>();
-        for (String shapeName: getStargateShapes().keySet()) {
-            shapeNames.add(getStargateShapeName(shapeName));
-        }
-        return shapeNames;
-    }
-
     @SuppressWarnings("deprecation")
 	private static boolean isStargateMaterial(final Block b, final StargateShape s) {
         return b.getTypeId() == s.getShapeStructureMaterial().getId();
@@ -451,11 +451,6 @@ public class StargateHelper {
         return getStargateShapes().containsKey(name.toLowerCase());
     }
     
-    public static void reloadShapes() {
-        stargateShapes.clear();
-        loadShapes();
-    }
-
     public static void loadShapes() {
         final File directory = new File("plugins" + File.separator + "StarGates" + File.separator + "GateShapes" + File.separator);
 
@@ -592,7 +587,7 @@ public class StargateHelper {
         
         return null;
     }
-    
+
     private static Stargate parseVersionedDataV3(World w, Stargate s, ByteBuffer byteBuff) {
         final byte[] locArray = new byte[32];
         final byte[] blocArray = new byte[12];
@@ -1051,7 +1046,7 @@ public class StargateHelper {
 
         return s;    
     }
-
+    
     @SuppressWarnings("deprecation")
 	private static Stargate parseVersionedDataV8(World w, Stargate s, ByteBuffer byteBuff) {
         final byte[] locArray = new byte[32];
@@ -1208,6 +1203,11 @@ public class StargateHelper {
         }
 
         return s;        
+    }
+
+    public static void reloadShapes() {
+        stargateShapes.clear();
+        loadShapes();
     }
     
     private static void setupSignGateNetwork(final Stargate stargate) {

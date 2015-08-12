@@ -1,14 +1,11 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.logic;
 
+import java.util.logging.Level;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.player.WormholePlayerManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-
-import java.util.logging.Level;
 
 public class StargateUpdateRunnable implements Runnable {
 
@@ -41,24 +38,6 @@ public class StargateUpdateRunnable implements Runnable {
         this.eventBlockAction = eventBlockAction;
     }
 
-    @SuppressWarnings("incomplete-switch")
-	private void runLogger(ActionToTake action) {
-
-        switch (action) {
-            case ESTABLISH_WORMHOLE:
-            case ANIMATE_WOOSH:
-            case LIGHTUP:
-                SGLogger.prettyLog(Level.FINER, false, "Run Action \"" + action.toString() + (stargate != null
-                        ? "\" Stargate \"" + stargate.getGateName()
-                        : "") + "\"");
-                return;
-        }
-        
-        SGLogger.prettyLog(Level.FINE, false, "Run Action \"" + action.toString() + ", ActionType: " + ((this.eventBlockAction != null) ? this.eventBlockAction.toString() : "NULL") + (stargate != null
-                ? "\" Stargate \"" + stargate.getGateName()
-                : "") + "\"");        
-    }
-    
     @Override
     public void run() {
         runLogger(action);
@@ -102,5 +81,23 @@ public class StargateUpdateRunnable implements Runnable {
             default:
                 break;
         }
+    }
+    
+    @SuppressWarnings("incomplete-switch")
+	private void runLogger(ActionToTake action) {
+
+        switch (action) {
+            case ESTABLISH_WORMHOLE:
+            case ANIMATE_WOOSH:
+            case LIGHTUP:
+                SGLogger.prettyLog(Level.FINER, false, "Run Action \"" + action.toString() + (stargate != null
+                        ? "\" Stargate \"" + stargate.getGateName()
+                        : "") + "\"");
+                return;
+        }
+        
+        SGLogger.prettyLog(Level.FINE, false, "Run Action \"" + action.toString() + ", ActionType: " + ((this.eventBlockAction != null) ? this.eventBlockAction.toString() : "NULL") + (stargate != null
+                ? "\" Stargate \"" + stargate.getGateName()
+                : "") + "\"");        
     }
 }

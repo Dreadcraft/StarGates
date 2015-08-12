@@ -1,28 +1,19 @@
 package net.doodcraft.Dooder07.Stargates.Wormhole.listeners;
 
+import java.util.Vector;
+import java.util.logging.Level;
+
+import javax.xml.stream.Location;
+
 import net.doodcraft.Dooder07.Stargates.Wormhole.StarGates;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.events.StargateMinecartTeleportEvent;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.Stargate;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.utils.SGLogger;
-
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.util.Vector;
-
-import java.util.logging.Level;
 
 public class StarGatesVehicleListener implements Listener {
 

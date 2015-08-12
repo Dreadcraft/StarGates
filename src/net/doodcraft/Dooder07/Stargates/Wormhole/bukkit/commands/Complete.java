@@ -3,13 +3,8 @@ package net.doodcraft.Dooder07.Stargates.Wormhole.bukkit.commands;
 import net.doodcraft.Dooder07.Stargates.Wormhole.config.ConfigManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.model.StargateManager;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions;
-import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.SGPermissions.PermissionType;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.doodcraft.Dooder07.Stargates.Wormhole.permissions.StargateRestrictions;
 
 public class Complete implements CommandExecutor {
 
